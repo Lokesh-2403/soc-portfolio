@@ -18,7 +18,7 @@ A cybersecurity project covering detection rule testing and incident response us
 - Examine false positives and missed attack scenarios.
 - Recommend improvements to the detection rule.
 
-**Test results:** To be added after testing.
+**Test results**: See results/test_results.md for measured results, performance metrics, false positives, missed cases, and improvement recommendations.
 
 ### Task 22: The Secret Accidentally Published
 
