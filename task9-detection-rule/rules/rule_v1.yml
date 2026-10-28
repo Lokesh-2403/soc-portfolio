@@ -1,0 +1,27 @@
+
+title: Windows Failed Logon Events - Baseline Detection
+id: 9d21f07a-7c15-4e86-a625-2b61c4a3b901
+status: experimental
+description: Detects Windows failed logon events as a baseline for authentication monitoring.
+author: Lokesh
+date: 2026-10-28
+
+logsource:
+    product: windows
+    service: security
+
+detection:
+    selection:
+        EventID: 4625
+    condition: selection
+
+falsepositives:
+    - Incorrect passwords
+    - Shared VPN or NAT addresses
+    - Service account authentication failures
+
+level: low
+
+tags:
+    - attack.credential-access
+    - attack.t1110.003

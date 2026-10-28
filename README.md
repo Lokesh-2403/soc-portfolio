@@ -1,24 +1,32 @@
 # SOC Analyst Portfolio
 
-A hands-on cybersecurity project focused on authentication log analysis, Sigma detection engineering, and evaluating detection accuracy using synthetic Windows-style security events.
+A cybersecurity project covering detection rule testing and incident response using synthetic authentication logs and a simulated exposed API credential.
 
-## Project Objectives
+## Assessment Tasks
 
-- Generate synthetic authentication logs for security analysis.
-- Represent successful and failed logons using Windows Event IDs 4624 and 4625.
-- Simulate normal authentication activity and password-spraying scenarios.
-- Develop Sigma detection rules.
-- Evaluate detection performance using true positives, false positives, and missed attacks.
-- Document detection limitations and opportunities for improvement.
+### Task 9: Test a Defensive Detection Rule
 
-## Technology Stack
+**Objective:** Test a detection rule against synthetic authentication logs and identify its limitations.
 
-- Python
-- CSV
-- pandas
-- PyYAML
-- Sigma CLI
-- Git and GitHub
+**Files:**
+- `generate_logs.py` — generates synthetic authentication events.
+- `logs/auth_logs.csv` — contains the generated events.
+- `rules/rule_v1.yml` — Sigma rule for detecting Windows failed logons.
+
+**Testing goals:**
+- Identify events that trigger the rule.
+- Examine false positives and missed attack scenarios.
+- Recommend improvements to the detection rule.
+
+**Test results:** To be added after testing.
+
+### Task 22: The Secret Accidentally Published
+
+**Objective:** Assess the exposure of a possible API credential in a public repository and recommend an incident response.
+
+**Deliverable:** `incident_response.md`
+
+The report covers credential revocation, investigation, verification, and preventive measures.
 
 ## Project Structure
 
@@ -26,97 +34,61 @@ A hands-on cybersecurity project focused on authentication log analysis, Sigma d
 soc-portfolio/
 ├── .gitignore
 ├── README.md
-└── task9-detection-rule/
-    ├── generate_logs.py
-    ├── logs/
-    │   └── auth_logs.csv
-    ├── rules/
-    └── results/
+├── task9-detection-rule/
+│   ├── generate_logs.py
+│   ├── logs/
+│   │   └── auth_logs.csv
+│   ├── rules/
+│   │   └── rule_v1.yml
+│   └── results/
+└── task22-leaked-secret/
+    └── incident_response.md
 ```
 
-## Synthetic Dataset
+## Requirements
 
-The current dataset contains 266 generated authentication events.
+- Python
+- pandas
+- PyYAML
+- Sigma CLI
 
-| Metric | Count |
-|---|---:|
-| Total events | 266 |
-| Attack-labelled events | 47 |
-| Benign events | 219 |
-| Failed logons (4625) | 114 |
-| Successful logons (4624) | 152 |
+## Setup and Run
 
-All events are synthetic and generated for educational purposes. They are not collected from real systems.
+Clone the repository and enter the project directory:
 
-## Simulated Scenarios
-
-- Normal successful logons
-- Occasional mistyped passwords
-- Multiple users sharing a VPN/NAT IP
-- Repeated failures from a service account
-- A single user's repeated authentication failures
-- Loud password spraying
-- Low-and-slow password spraying
-
-## Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone <YOUR-GITHUB-REPOSITORY-URL>
+```powershell
+git clone https://github.com/Lokesh-2403/soc-portfolio.git
 cd soc-portfolio
 ```
 
-### 2. Create and activate a virtual environment
-
-Windows PowerShell:
+Create and activate a virtual environment:
 
 ```powershell
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
-### 3. Install dependencies
+Install the dependencies:
 
 ```powershell
 python -m pip install pandas pyyaml sigma-cli
 ```
 
-### 4. Generate the authentication logs
+Generate the synthetic authentication logs:
 
 ```powershell
 python task9-detection-rule\generate_logs.py
 ```
 
-The generated CSV is saved to:
+Validate the Sigma rule:
 
-`task9-detection-rule/logs/auth_logs.csv`
-
-## Detection Engineering
-
-The project is being developed in stages:
-
-1. Generate labelled synthetic authentication data.
-2. Create a baseline Sigma rule.
-3. Evaluate detections against the known scenario labels.
-4. Measure precision, recall, false positives, and missed attacks.
-5. Refine detection logic and document its limitations.
-
-The initial failed-logon rule is a baseline, not a complete password-spray detector. Detection quality will be assessed through testing rather than assumed.
-
-## Learning Outcomes
-
-- Authentication log analysis
-- Basic detection engineering
-- Sigma rule development
-- Security alert evaluation
-- False-positive and false-negative analysis
-- Python scripting for security operations
-- Git-based project documentation
+```powershell
+sigma check task9-detection-rule\rules\rule_v1.yml
+```
 
 ## Disclaimer
 
-This project is for educational and defensive cybersecurity purposes. It uses synthetic data and does not perform attacks against real systems.
+This project is for educational and defensive cybersecurity purposes. The authentication logs are synthetic and do not represent real security incidents.
 
 ## Author
 
