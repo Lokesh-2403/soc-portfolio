@@ -6,7 +6,7 @@
 
 
 
-Test a Sigma rule that detects Windows failed-logon events and identify its false positives, missed cases, and possible improvements.
+Test a Sigma rule that detects Windows failed-logon events and identify false positives, missed attack events, and possible improvements.
 
 
 
@@ -14,23 +14,23 @@ Test a Sigma rule that detects Windows failed-logon events and identify its fals
 
 
 
-The test dataset contains 266 synthetic authentication events.
+The dataset contains 266 synthetic authentication events.
 
 
 
-| Event type | Count |
+| Metric                   | Count |
 
-|---|---:|
+| ------------------------ | ----: |
 
-| Successful logons (4624) | 152 |
+| Total events             |   266 |
 
-| Failed logons (4625) | 114 |
+| Attack-labelled events   |    47 |
 
-| Benign-labelled events | 219 |
+| Benign-labelled events   |   219 |
 
-| Attack-labelled events | 47 |
+| Failed logons (4625)     |   114 |
 
-| \*\*Total events\*\* | \*\*266\*\* |
+| Successful logons (4624) |   152 |
 
 
 
@@ -38,83 +38,117 @@ Scenarios include normal logons, mistyped passwords, shared VPN IPs, service-acc
 
 
 
-\## 3. Test Cases
+\## 3. Test Method
 
 
 
-| Test case | Expected rule behaviour |
-
-|---|---|
-
-| Successful logon (4624) | No alert |
-
-| Failed logon (4625) | Alert |
-
-| Mistyped password | Alert; may be a false positive |
-
-| Shared VPN IP with failed logons | Alert for each matching failure |
-
-| Service-account authentication failure | Alert; may be a false positive |
-
-| Loud password spraying | Matching failed logons alert, but the rule does not identify the overall spraying pattern |
-
-| Low-and-slow password spraying | Matching failed logons alert, but the overall pattern may not be recognized |
+The rule condition was evaluated against the CSV data: events with `event\_id = 4625` were counted as alerts, and all other events were counted as non-alerts. Results were compared with the dataset's `label` field.
 
 
 
-\## 4. Results and Limitations
+The Sigma rule was also validated using `sigma check`. It reported zero errors, condition errors, and validation issues.
 
 
 
-The Sigma rule passed validation with zero errors, zero condition errors, and zero validation issues.
+\## 4. Measured Results
 
 
 
-The dataset contains 114 failed-logon events and 152 successful-logon events. Based on the rule condition, failed-logon events match the rule, while successful-logon events do not.
+| Result               | Count |
+
+| -------------------- | ----: |
+
+| True positives       |    45 |
+
+| False positives      |    69 |
+
+| Missed attack events |     2 |
+
+| True negatives       |   150 |
+
+| Total alerts         |   114 |
 
 
 
-These counts describe the dataset and rule condition; they are not a measured precision or recall score. The rule has not yet been evaluated against each labelled event to calculate confirmed false positives and missed attacks.
+\### Performance Metrics
 
 
 
-\### Potential False Positives
+| Metric              | Result |
+
+| ------------------- | -----: |
+
+| Precision           | 39.47% |
+
+| Recall              | 95.74% |
+
+| Accuracy            | 73.31% |
+
+| False-positive rate | 31.51% |
 
 
 
-\- Users entering incorrect passwords.
-
-\- Shared VPN or NAT addresses generating failures from multiple users.
-
-\- Service accounts using expired or incorrect credentials.
+Calculations use the synthetic dataset's labels as the reference.
 
 
 
-\### Detection Gaps
+\## 5. Scenario Findings
 
 
 
-The rule detects individual failed logons rather than identifying repeated failures across multiple accounts or a time window. Therefore, it cannot independently confirm password spraying.
+\- \*\*Normal logons:\*\* 120 benign events did not trigger alerts.
+
+\- \*\*Mistyped passwords:\*\* 18 benign events triggered alerts.
+
+\- \*\*Service-account failures:\*\* 24 benign events triggered alerts.
+
+\- \*\*Shared VPN IP:\*\* 19 benign events triggered alerts, while 30 did not.
+
+\- \*\*Lockout activity:\*\* 8 benign events triggered alerts.
+
+\- \*\*Loud password spraying:\*\* 25 attack-labelled events triggered alerts; 1 was missed.
+
+\- \*\*Low-and-slow password spraying:\*\* 20 attack-labelled events triggered alerts; 1 was missed.
 
 
 
-\## 5. Recommended Improvement
+\## 6. False Positives and Missed Cases
 
 
 
-Keep the failed-logon rule as a basic alert and add a separate correlation rule that detects repeated failures across multiple user accounts from the same source IP within a defined time window. Test the correlation rule against both loud and low-and-slow spraying scenarios.
+The rule generates false positives because ordinary failed logons can result from mistyped passwords, service-account problems, and shared VPN activity.
 
 
 
-\## 6. Conclusion
+Two attack-labelled events were missed because their event IDs did not match the rule's failed-logon condition. This shows that the rule does not identify every attack-related event in the dataset.
 
 
 
-The current rule is a valid baseline for detecting Windows failed-logon events. It is useful for basic authentication monitoring, but additional correlation and testing are needed to identify password spraying reliably.
+\## 7. Recommended Improvement
 
 
 
-All logs used in this assessment are synthetic and intended for defensive cybersecurity practice.
+Keep the failed-logon rule as a basic alert. Add a separate correlation rule that looks for repeated failures across multiple user accounts from the same source IP within a defined time window. Test the correlation logic against loud and low-and-slow password spraying.
+
+
+
+\## 8. Conclusion
+
+
+
+The rule detected 45 of 47 attack-labelled events, but 69 benign events also triggered alerts. Its measured recall was high, while its precision was low.
+
+
+
+The rule is useful as a baseline for authentication monitoring, but it needs additional correlation logic and testing to identify password spraying more accurately.
+
+
+
+\*\*Limitations:\*\* These results come from synthetic data and a direct simulation of the rule's `4625` condition. The Sigma rule was syntax-validated but was not executed in a live SIEM. Results may differ with real Windows security logs.
+
+
+
+All data is synthetic and used for defensive cybersecurity practice.
 
 
 
